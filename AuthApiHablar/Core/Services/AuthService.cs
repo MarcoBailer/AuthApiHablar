@@ -64,6 +64,7 @@ namespace AuthApiHablar.Core.Services
             return new AuthServiceResponseDto()
             {
                 IsSuccess = true,
+                UserId = user.Id,
                 Message = token
             };
         }
@@ -104,13 +105,22 @@ namespace AuthApiHablar.Core.Services
                 };
             }
 
+            var login = new LoginDto()
+            {
+                Email = registerDto.Email,
+                Password = registerDto.Password
+            };
+
+            var logged = await LoginAsync(login);
+
             // Add a Default USER to all users
             //await _userManager.AddToRoleAsync(newUser, StaticUserPlan.USER);
 
             return new AuthServiceResponseDto()
             {
                 IsSuccess = true,
-                Message = "User Created Sucessfully"
+                Message = logged.Message,
+                UserId = logged.UserId
             };
         }        
 
