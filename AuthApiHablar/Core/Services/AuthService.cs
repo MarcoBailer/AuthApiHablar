@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace AuthApiHablar.Core.Services
@@ -115,15 +116,19 @@ namespace AuthApiHablar.Core.Services
 
         private string GenerateJwtToken(List<Claim> authClaims)
         {
-            var authSecret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            string privateKeyPem = System.IO.File.ReadAllText("C:\\Users\\maico\\source\\repos\\AuthApiHablar\\private.key");
+            RSA rsa = RSA.Create();
+            rsa.ImportFromPem(privateKeyPem.ToCharArray());
+
+            var creds = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256);
 
             var tokenObject = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],
                 audience: _configuration["JWT:ValidAudience"],
                 expires: DateTime.Now.AddHours(1),
                 claims: authClaims,
-                signingCredentials: new SigningCredentials(authSecret, SecurityAlgorithms.HmacSha256)
-                );
+                signingCredentials: creds
+            );
 
             string token = new JwtSecurityTokenHandler().WriteToken(tokenObject);
 
