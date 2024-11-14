@@ -64,7 +64,6 @@ namespace AuthApiHablar.Core.Services
             return new AuthServiceResponseDto()
             {
                 IsSuccess = true,
-                UserId = user.Id,
                 Message = token
             };
         }
@@ -120,7 +119,6 @@ namespace AuthApiHablar.Core.Services
             {
                 IsSuccess = true,
                 Message = logged.Message,
-                UserId = logged.UserId
             };
         }        
 
